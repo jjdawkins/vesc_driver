@@ -18,7 +18,7 @@ using namespace std::chrono_literals;
 namespace vesc_driver
 {
 
-VescDriver::VescDriver() :Node("vesc_driver_node"),
+VescDriver::VescDriver() : Node("vesc_driver_node"),
   vesc_(std::string(),
         std::bind(&VescDriver::vescPacketCallback, this, _1),
         std::bind(&VescDriver::vescErrorCallback, this, _1)),
@@ -63,12 +63,13 @@ VescDriver::VescDriver() :Node("vesc_driver_node"),
 
   // since vesc state does not include the servo position, publish the commanded
   // servo position as a "sensor"
+  //publisher_ = this->create_publisher<std_msgs::msg::String>("topic", 10);  
+  
   servo_sensor_pub_ = this->create_publisher<std_msgs::msg::Float64>("sensors/servo_position_command", 10);
- subscription_ = this->create_subscription<std_msgs::msg::Float64>(
-      "topic", 10, std::bind(&VescDriver::dutyCycleCallback, this, _1));
+  state_pub_ = this->create_publisher<vesc_msgs::msg::VescStateStamped>("sensors/core", 10);
+  
   // subscribe to motor and servo command topics
   
- // duty_cycle_sub_ = this->create_subscription<std_msgs::msg::String>("topic", 10, &VescDriver::dutyCycleCallback);
   duty_cycle_sub_ = this->create_subscription<std_msgs::msg::Float64>("commands/motor/duty_cycle", 10,std::bind(&VescDriver::dutyCycleCallback,this,_1));
   current_sub_ = this->create_subscription<std_msgs::msg::Float64>("commands/motor/current", 10, std::bind(&VescDriver::currentCallback,this,_1));
   brake_sub_ = this->create_subscription<std_msgs::msg::Float64>("commands/motor/brake", 10, std::bind(&VescDriver::brakeCallback, this,_1));
@@ -77,8 +78,7 @@ VescDriver::VescDriver() :Node("vesc_driver_node"),
   servo_sub_ = this->create_subscription<std_msgs::msg::Float64>("commands/servo/position", 10, std::bind(&VescDriver::servoCallback, this,_1));
 
   // create a 50Hz timer, used for state machine & polling VESC telemetry
- // timer_ = this->cr  .createTimer(ros::Duration(1.0/50.0), &VescDriver::timerCallback, this);
-   timer_ = this->create_wall_timer(20ms, std::bind(&VescDriver::timerCallback, this));  
+  timer_ = this->create_wall_timer(20ms, std::bind(&VescDriver::timerCallback, this));  
    
 
 }
@@ -134,7 +134,7 @@ void VescDriver::timerCallback()
 
 void VescDriver::vescPacketCallback(const boost::shared_ptr<VescPacket const>& packet)
 {
-    std::cout<<"Debug Packet"<<std::endl;
+    std::cout<<"Debug Packet: " << packet->name() <<std::endl;
 
   if (packet->name() == "Values") {
     boost::shared_ptr<VescPacketValues const> values =
@@ -246,7 +246,7 @@ void VescDriver::servoCallback(const std_msgs::msg::Float64::SharedPtr servo)
     // publish clipped servo value as a "sensor"
     std_msgs::msg::Float64::SharedPtr servo_sensor_msg(new std_msgs::msg::Float64);
     servo_sensor_msg->data = servo_clipped;
-    //servo_sensor_pub_-> publish(servo_sensor_msg);
+    servo_sensor_pub_-> publish(servo_sensor_msg);
   }
 }
 
