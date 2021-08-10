@@ -99,7 +99,7 @@ VescDriver::VescDriver() : Node("vesc_driver_node"),
 void VescDriver::timerCallback()
 {
   // VESC interface should not unexpectedly disconnect, but test for it anyway
-   std::cout<<"Debug "<<vesc_.isConnected()<<std::endl;
+   //std::cout<<"Debug "<<vesc_.isConnected()<<std::endl;
     
   if (!vesc_.isConnected()) {
     RCLCPP_FATAL(this->get_logger(),"Unexpectedly disconnected from serial port.");
@@ -134,7 +134,7 @@ void VescDriver::timerCallback()
 
 void VescDriver::vescPacketCallback(const boost::shared_ptr<VescPacket const>& packet)
 {
-    std::cout<<"Debug Packet: " << packet->name() <<std::endl;
+   // std::cout<<"Debug Packet: " << packet->name() <<std::endl;
 
   if (packet->name() == "Values") {
     boost::shared_ptr<VescPacketValues const> values =
