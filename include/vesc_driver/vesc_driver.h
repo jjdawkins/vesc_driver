@@ -57,8 +57,8 @@ private:
   
   rclcpp::Publisher<vesc_msgs::msg::VescStateStamped>::SharedPtr state_pub_;
   rclcpp::Publisher<std_msgs::msg::Float64>::SharedPtr servo_sensor_pub_;
+  
   rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr subscription_;
-
   rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr duty_cycle_sub_;
   rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr current_sub_;
   rclcpp::Subscription<std_msgs::msg::Float64>::SharedPtr brake_sub_;

@@ -244,8 +244,8 @@ void VescDriver::servoCallback(const std_msgs::msg::Float64::SharedPtr servo)
     double servo_clipped(servo_limit_.clip(servo->data));
     vesc_.setServo(servo_clipped);
     // publish clipped servo value as a "sensor"
-    std_msgs::msg::Float64::SharedPtr servo_sensor_msg(new std_msgs::msg::Float64);
-    servo_sensor_msg->data = servo_clipped;
+    auto servo_sensor_msg = std_msgs::msg::Float64();
+    servo_sensor_msg.data = servo_clipped;
     servo_sensor_pub_-> publish(servo_sensor_msg);
   }
 }
